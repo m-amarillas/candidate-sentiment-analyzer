@@ -1,3 +1,9 @@
+# Candidate Sentiment Analyzer
+The Sentiment Analyzer will take recorded interview conversational text and interpret the candidate's sentiment. When paired with the AI voice conversation capture, you can begin interpreting the candidate's tone and personality. Additionally, you can match the sentiment with the position's requirements.
+
+For example, if you're hiring for a customer-facing role, you want somebody who is more upbeat and positive. If you seek a leadership/executive role, you want somebody concise yet strategic. This app is the starting point for providing these insights using model-building APIs from TensorFlow.
+
+
 ## Build Commands
 
 1. Create the enviornment using this command:
