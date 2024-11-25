@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bullhorn Sentiment Analyzer</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.socket.io/4.8.1/socket.io.min.js"
+      integrity="sha384-mkQ3/7FUtcGyoppY6bz/PORYoGqOl7/aSUMn2ymDOJcapfS6PHqxhRTMh1RR0Q6+"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      .card-main {
+        width: 50%;
+        margin: 10% auto;
+      }
+      .card-main-image {
+        width: 200px;
+        margin: 0 auto;
+      }
+      .text-input,
+      .card-text,
+      .prediction-card {
+        width: 50%;
+        margin: 2% auto;
+      }
+      #prediction-positive {
+        color: #fff;
+        background-color: #20c997;
+      }
+
+      #response-container {
+        margin-top: 1%;
+      }
+      #analyzing-data-spinnger,
+      .prediction-card {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Bullhorn</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="#">Home</a>
+            </li>
+            <li>
+              <a class="nav-link" data-bs-toggle="offcanvas" href="#offcanvas" role="button" aria-controls="offcanvas">Help</a>
+            </li>
+          </ul>
+          <form class="d-flex" role="search">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+            <button class="btn btn-outline-success" type="submit">Search</button>
+          </form>
+        </div>
+      </div>
+    </nav>
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas" aria-labelledby="offcanvasLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasLabel">What is the Bullhorn Sentiment Analyzer?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <div>
+          The Sentiment Analyzer will take recorded interview conversational text and interpret the candidate's sentiment. When paired with the AI voice
+          conversation capture, you can begin interpreting the candidate's tone and personality. Additionally, you can match the sentiment with the position's
+          requirements.
+        </div>
+      </div>
+    </div>
+    <div class="card card-main text-center">
+      <img src="https://vectorlogoseek.com/wp-content/uploads/2018/11/bullhorn-inc-vector-logo.png" class="card-main-image card-img-top" />
+      <div class="card-body">
+        <h5 class="card-title">Candidate Interview Response</h5>
+        <p class="card-text">Enter the candidate's text response below. Text will be analyzed as Positive or Negative using a built-in AI model</p>
+        <textarea class="form-control text-input" id="textInputTextarea" rows="3"></textarea>
+        <a id="analyze-button" onclick="handleAnalyzeClick()" class="btn btn-primary">Analyze</a>
+        <div id="response-container">
+          <div class="spinner-border" id="analyzing-data-spinnger" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <div id="prediction-positive" class="card prediction-card mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Positive Response</h5>
+              <p class="card-text">Candidate responded positively with x% confidence</p>
+            </div>
+          </div>
+          <div id="prediction-negative" class="card prediction-card text-bg-light mb-3">
+            <div class="card-body">
+              <h5 class="card-title">Negative Response</h5>
+              <p class="card-text">Candidate responded negatively with x% confidence</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      var socket = io("/");
+
+      function handleAnalyzeClick() {
+        const text = document.getElementById("textInputTextarea").value;
+
+        if (!text) {
+          alert("Please enter text");
+          return false;
+        }
+
+        document.getElementById("analyzing-data-spinnger").style.display = "inline-block";
+
+        socket.emit("text_received", text);
+      }
+
+      socket.on("prediction_ready", function (prediction_result) {
+        document.getElementById("analyzing-data-spinnger").style.display = "none";
+        const prediction_cards = document.querySelectorAll(".prediction-card");
+        prediction_cards.forEach((card) => {
+          card.style.display = "none";
+        });
+
+        const prediction_container = document.getElementById(prediction_result.result == "Positive" ? "prediction-positive" : "prediction-negative");
+        prediction_container.style.display = "block";
+
+        const subText = prediction_container.querySelector(".card-text");
+        subText.textContent = subText.textContent.replace("x%", `${prediction_result.confidence}%`);
+      });
+    </script>
+  </body>
+</html>
