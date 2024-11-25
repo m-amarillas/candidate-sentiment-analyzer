@@ -111,7 +111,7 @@ class ModelService:
         self.model.fit(
             reviews_train,
             sentiments_train,
-            epochs=1,
+            epochs=10,
             validation_data=(reviews_test, sentiments_test),
         )
 
