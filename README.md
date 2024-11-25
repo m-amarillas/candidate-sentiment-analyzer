@@ -19,9 +19,13 @@ For example, if you're hiring for a customer-facing role, you want somebody who 
 ## Run theApp
 
 1. If not done, run source venv/bine/activate to enter the virtual machine
-2. Run the app
+2. Navigate to src ```cd src```
+2. Run the app in development mode
+    
+    ```python3 app.py```
+2. Run the app in production mode
 
-    ```python3 -m flask run```
+    ```gunicorn --worker-class eventlet -w 1 --bind 0.0.0.0:3000 app:app```
 
 ## Build and Run Docker
 
