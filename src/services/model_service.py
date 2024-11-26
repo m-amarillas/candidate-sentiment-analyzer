@@ -37,7 +37,10 @@ class ModelService:
 
     def train_model(self):
         print("Pulling data from file...")
-        base_dir = os.path.dirname(sys.prefix)
+
+        current_dir = os.path.dirname(__file__)
+        src_dir = os.path.dirname(current_dir)
+        base_dir = os.path.dirname(src_dir)
         file_path = os.path.join(base_dir, self.model_training_file)
 
         # Loading in the file continaing the preprocessed positive
