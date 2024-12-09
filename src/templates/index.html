@@ -46,8 +46,13 @@
         margin-top: 1%;
       }
       #analyzing-data-spinnger,
-      .prediction-card {
+      .prediction-card,
+      #model-loaded {
         display: none;
+      }
+      #model-stats {
+        font-size: 12px;
+        margin-top: 10%;
       }
     </style>
   </head>
@@ -101,12 +106,22 @@
         <h5 class="card-title">Candidate Interview Response</h5>
         <p class="card-text">Enter the candidate's text response below. Text will be analyzed as Positive or Negative using a built-in AI model</p>
         <p class="card-text card-question">Question: Tell me about your experience at your previous company</p>
-        <textarea class="form-control text-input" id="textInputTextarea" rows="3"></textarea>
-        <a id="analyze-button" onclick="handleAnalyzeClick()" class="btn btn-primary">Analyze</a>
+        <div id="answer-input-container">
+          <textarea class="form-control text-input" id="textInputTextarea" disabled rows="3" placeholder="Provide your answer..."></textarea>
+          <div id="model-loading">
+            <div class="spinner-border" id="model-loading-spinner" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+          </div>
+          <div id="model-loaded">
+            <a id="analyze-button" onclick="handleAnalyzeClick()" class="btn btn-primary">Analyze</a>
+          </div>
+        </div>
         <div id="response-container">
           <div class="spinner-border" id="analyzing-data-spinnger" role="status">
             <span class="visually-hidden">Loading...</span>
           </div>
+          <div id="model-status-update">Starting Model...</div>
           <div id="prediction-positive" class="card prediction-card mb-3">
             <div class="card-body">
               <h5 class="card-title">Positive Response</h5>
@@ -119,6 +134,7 @@
               <p class="card-text">Candidate responded negatively with x% confidence</p>
             </div>
           </div>
+          <div id="model-stats"></div>
         </div>
       </div>
     </div>
@@ -129,7 +145,7 @@
         const text = document.getElementById("textInputTextarea").value;
 
         if (!text) {
-          alert("Please enter text");
+          alert("Please answer the question");
           return false;
         }
 
@@ -137,6 +153,18 @@
 
         socket.emit("text_received", text);
       }
+
+      socket.on("model-status-update", function (status_message) {
+        document.getElementById("model-status-update").innerHTML = status_message.replace(/\n/g, "<br />");
+      });
+
+      socket.on("model-loaded", function (status_message) {
+        document.getElementById("model-status-update").style.display = "none";
+        document.getElementById("model-stats").innerHTML = `<strong>Model Stats: </strong>${status_message}`;
+        document.getElementById("model-loading").style.display = "none";
+        document.getElementById("model-loaded").style.display = "inline-block";
+        document.getElementById("textInputTextarea").removeAttribute("disabled");
+      });
 
       socket.on("prediction_ready", function (prediction_result) {
         document.getElementById("analyzing-data-spinnger").style.display = "none";
@@ -151,6 +179,8 @@
         const subText = prediction_container.querySelector(".card-text");
         subText.textContent = subText.textContent.replace("x%", `${prediction_result.confidence}%`);
       });
+
+      socket.emit("load_model");
     </script>
   </body>
 </html>
