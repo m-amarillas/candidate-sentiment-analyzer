@@ -35,4 +35,4 @@ def handle_text_received(text):
 
 if __name__ == "__main__":
     print("App started. Listening...")
-    socketio.run(app, port=3000)
+    socketio.run(app, port=8080)

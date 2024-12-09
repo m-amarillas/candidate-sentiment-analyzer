@@ -41,4 +41,10 @@ For example, if you're hiring for a customer-facing role, you want somebody who 
     ```docker build -t sentiment-analysis .```
 2. Start the Image
 
-    ```docker run -d -p 80:5000 sentiment-analysis```
+    ```docker run -d -p 3000:8080 sentiment-analysis```
+
+## Deployment
+
+The app is currently deployed on in Google Cloud using their on-demand Cloud Run service. With proper permissions, you can deploy using this command:
+
+```gcloud run deploy sentiment-analyzer --memory 2G --cpu 4 --source .```

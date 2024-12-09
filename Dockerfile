@@ -10,6 +10,6 @@ COPY . .
 
 WORKDIR /app/src
 
-EXPOSE 3000
+EXPOSE 8080
 
-CMD [ "gunicorn", "--worker-class" , "eventlet", "-w", "1", "--bind", "0.0.0.0:3000", "app:app"]
+CMD [ "gunicorn", "--worker-class" , "eventlet", "--bind", "0.0.0.0:8080", "app:app"]
